@@ -49,18 +49,19 @@ int main(int argc, char** argv){
   printf("\n------------- Serial [%d, %d] ----------------\n", N, M);
   printf("Time: %.6f ms\n", time * 1000.0);
   print_res(res_s);
-  
-  ////////////////////////////////////////
-  //                                    //
-  //       PARALLEL VERSION             //
-  //                                    //
-  ////////////////////////////////////////
-
+ 
+  /* Loop through every possible number of threads*/
   for(size_t np=1; np<=MAX_THREADS; np<<=1)
     parallel_func(A, np);
 
   return 0;
 }
+
+////////////////////////////////////////
+//                                    //
+//       PARALLEL VERSION             //
+//                                    //
+////////////////////////////////////////
 
 void parallel_func(int* A, size_t np){
   double time = OMP_TIME;
@@ -96,7 +97,7 @@ void parallel_func(int* A, size_t np){
     /* Syncronize threads before entering tree stage */
     #pragma omp barrier
     
-    /* The result is gathered to Thread with id 0 with a previoulsy implemented tree*/
+    /* The result is gathered to Thread with id 0 in a tree-like data flow way*/
     for(int j=2; j<=np; j<<=1){
       if(tid % j == 0){
         //printf(" {j %d} Thread %d is taking from Thread %ld\n", j, tid, tid + j/2);
